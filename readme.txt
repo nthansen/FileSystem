@@ -1,4 +1,4 @@
-This project shows all the documentation and files we've created to implement a file system. Throughout the quarter we developed a cache system, multi-level feedback queue job scheduler and deadlock prevention system. If you would like to see the source code of these additional components, please email me at nthansen@uw.edu.
+This project shows all the documentation and files we've created to implement a file system. Throughout the quarter we developed a cache system, multi-level feedback queue and deadlock prevention system. If you would like to see the source code of these additional components, please email me at nthansen@uw.edu.
 
 File System Report 
 
