@@ -1,4 +1,6 @@
-Final Project Report (Unix like file system)
+This project shows all the documentation and files we've created to implement a file system. Throughout the quarter we developed a cache system, multi-level feedback queue job scheduler and deadlock prevention system. If you would like to see the source code of these additional components, please email me at nthansen@uw.edu.
+
+File System Report 
 
 Team:
 Norman Hansen	
@@ -13,7 +15,7 @@ Part 3: How to execute:
 
 Part 1: System Description:
 
-This file system provides a root ì \î directory as it initialize and then all other directories are dynamically created by the user. The system will provide user thread to following system calls that allow them to format, open, read from, write to, update the seek pointer of, close, delete, and get the size of their files. Each user will keep track of file they have opened. Upon a boot, the file system instantiates a Directory object as the root directory, reads the file from the disk that can be found through the inode 0 at 32 bytes of the disk block 1, and initializes the Directory instance with the file contents. On the other hand, prior to a shutdown, the file system will write back the Directory information onto the disk. 
+This file system provides a root ‚Äú \‚Äù directory as it initialize and then all other directories are dynamically created by the user. The system will provide user thread to following system calls that allow them to format, open, read from, write to, update the seek pointer of, close, delete, and get the size of their files. Each user will keep track of file they have opened. Upon a boot, the file system instantiates a Directory object as the root directory, reads the file from the disk that can be found through the inode 0 at 32 bytes of the disk block 1, and initializes the Directory instance with the file contents. On the other hand, prior to a shutdown, the file system will write back the Directory information onto the disk. 
 
 Part 2: Specifications and Internal Design:
 
@@ -25,11 +27,11 @@ Assumptions and Limitations
 - Users cannot edit the same file simultaneously
 - There is no user interface that would make working with the file system much easier
 - This file system can only work on ThreadOS
-- The user wonít modify the current functions inside ThreadOS
+- The user won‚Äôt modify the current functions inside ThreadOS
 - Inability to create user permissions so that only certain users can access certain files
 
 1. FileSystem.java
-File systems bring together all other classes, It instantiates an instances of the SuperBlock, Directory and the File Table. It maintains the File System by providing interface to the system calls. following are itís behaviour: 
+File systems bring together all other classes, It instantiates an instances of the SuperBlock, Directory and the File Table. It maintains the File System by providing interface to the system calls. following are it‚Äôs behaviour: 
 
 FileSystem Functions:
 1.	int SysLib.format( int files );
@@ -39,10 +41,10 @@ formats the disk, (Disk.java's data contents).The parameter (files) will specifi
 Opens the file specified using the given fileName and mode (where "r" = ready only, "w" = write only, "w+" = read/write, "a" = append), and it will allocate a new file descriptor(fd). A new file is created if it does not exist in the mode "w", "w+" or "a". SysLib.open will return -1 as an error value if the file does not exist in the mode "r". File descriptors 0, 1, and 2 are reserved as the standard input, output, and error, and therefore a newly opened file will receive a new descriptor numbered in the range between 3 and 31. If the calling thread's user file descriptor table is full, SysLib.open should return the error value. The seek pointer is initialized to zero in the mode "r", "w", and "w+", whereas initialized at the end of the file in the mode "a".
 
 3.	int read( int fd, byte buffer[] );
-Starting at seek pointerís position, it will read bytes up to buffer.length from the file indicated by fd. If bytes remaining between the current seek pointer and the end of file are less than buffer.length, SysLib.read reads as many bytes as possible, putting them into the beginning of buffer. It increments the seek pointer by the number of bytes to have been read. Returns number of bytes if success, otherwise -1 one for error.
+Starting at seek pointer‚Äôs position, it will read bytes up to buffer.length from the file indicated by fd. If bytes remaining between the current seek pointer and the end of file are less than buffer.length, SysLib.read reads as many bytes as possible, putting them into the beginning of buffer. It increments the seek pointer by the number of bytes to have been read. Returns number of bytes if success, otherwise -1 one for error.
 
 4.	int write( int fd, byte buffer[] );
-Starting at seek pointerís position, it will write the contents of buffer to the file indicated by fd. The operation may overwrite existing data in the file and/or append to the end of the file. SysLib.write increments the seek pointer by the number of bytes to have been written. Returns number of bytes if success, otherwise -1 one for error.
+Starting at seek pointer‚Äôs position, it will write the contents of buffer to the file indicated by fd. The operation may overwrite existing data in the file and/or append to the end of the file. SysLib.write increments the seek pointer by the number of bytes to have been written. Returns number of bytes if success, otherwise -1 one for error.
 
 5.	int seek( int fd, int offset, int whence );
 User will not be able to set the seek pointer at any negative value or beyond the file size. these positions will automatically be adjusted to the beginning or end of the file respectively but will still be considered success. Other updates of the seek pointer corresponding to fd are as following:
@@ -73,10 +75,10 @@ The file system maintains the file (structure) table shared among all user threa
 
 5. Inode.java
 This inode is a simplified version of the Unix inode, It includes 12 pointers of the index block. The first 11 of these pointers point to direct blocks. The last pointer points to an indirect block. Each inode also include the length of the corresponding file,  the number of file table entries that point to this inode, and flag of weather it is  unused = 0, used = 1, or in some other status = 2, 3, 4.
-In order to keep the Inodes consistent among users, we check for the inode on the diskís status before updating the local inode, if some other user updated the inode on disk, we immedialy write back the content. This content includes int length, short count, short flag, short direct[11], and short indirect, which is total of 32 bytes.
+In order to keep the Inodes consistent among users, we check for the inode on the disk‚Äôs status before updating the local inode, if some other user updated the inode on disk, we immedialy write back the content. This content includes int length, short count, short flag, short direct[11], and short indirect, which is total of 32 bytes.
 
 6. TCB.java
-This class maintains a file table for all the files opened by the individual users. This table is called a user file descriptor table. It has 32 entries. Each file descriptor will include the file access mode and the reference to the corresponding file table entry which contain the information regarding the file status and read position (seek ptr). The file access mode indicates "read only", "write only", "read/write", or "append".  The system maintains the structure of the file and it is shared among all users. The Seek ptr is positioned according to the file access mode and it is either position at the beginning to read the file or at the end to write to the file. Even when same user reads the file multiple times and make several entries in the TCBís user file descriptor table and have various file table entry references, only the seek ptr location will vary and all will refer to same inode. 
+This class maintains a file table for all the files opened by the individual users. This table is called a user file descriptor table. It has 32 entries. Each file descriptor will include the file access mode and the reference to the corresponding file table entry which contain the information regarding the file status and read position (seek ptr). The file access mode indicates "read only", "write only", "read/write", or "append".  The system maintains the structure of the file and it is shared among all users. The Seek ptr is positioned according to the file access mode and it is either position at the beginning to read the file or at the end to write to the file. Even when same user reads the file multiple times and make several entries in the TCB‚Äôs user file descriptor table and have various file table entry references, only the seek ptr location will vary and all will refer to same inode. 
 
 Part 3: How to execute
 
